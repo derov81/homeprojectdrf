@@ -1,0 +1,4 @@
+1. pip install fastapi
+pip install uvicorn  #web server
+uvicorn main:app --reload #start web server
+pip install pydantic
