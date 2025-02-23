@@ -1,11 +1,16 @@
-from pydantic.v1 import BaseModel
+#from pydantic.v1 import BaseModel
 
+
+
+#***************************
 from  . models import Tool
 from  . models import Order
 from  . models import Detail
 from  . models import Operation
 from rest_framework import serializers
 
+
+#***********************************************************
 class ToolSeralizer(serializers.ModelSerializer):
 
     class Meta:
