@@ -1,15 +1,17 @@
 import React, {useState, useEffect} from 'react';
-import Header from './components/Header/Header';
+import Header from './components/Common/Header';
 import Login from './components/Login';
 import authService from './services/authService';
 import TabsSection from "./components/TabsSection";
-import OrdersAndParts from "./OrdersAndParts";
 import FeedbackSection from "./components/FeedbackSection";
+import Home from "./components/Home";
+
+
+
 
 const App = () => {
     const [user, setUser] = useState(null);
     const [showLogin, setShowLogin] = useState(false);
-
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [tab, setTab] = useState('main');
 
@@ -41,30 +43,31 @@ const App = () => {
 
     return (
         <div>
-           <Header 
-                user={user} 
+            <Header
+                user={user}
                 onLogout={handleLogout}
                 onLoginClick={handleLoginClick}
             />
-            <Login 
-                show={showLogin} 
+            <Login
+                show={showLogin}
                 onLoginSuccess={handleLoginSuccess}
                 setShowLogin={setShowLogin}
             />
 
+            <main style={{marginLeft: '1rem'}}>
 
-                <main style={{marginLeft: '1rem'}}>
-                    <TabsSection active={tab} onChange={(current) => setTab(current)}/>
-                    {tab === 'main' && (
-                        <>
-                            {!selectedOrder && (
-                                <OrdersAndParts onSelect={(orderId) => setSelectedOrder(orderId)}/>
-                            )}
-                        </>
-                    )}
+                <TabsSection active={tab} onChange={(current) => setTab(current)}/>
+                {tab === 'main' && (
+                    <>
+                        {!selectedOrder && (
+                            <Home onSelect={(orderId) => setSelectedOrder(orderId)}/>
+                        )}
+                    </>
+                )}
 
-                    {tab === 'feedback' && <FeedbackSection/>}
-                </main>
+                {tab === 'feedback' && <FeedbackSection/>}
+
+            </main>
         </div>
     );
 };

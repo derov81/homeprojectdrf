@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 from datetime import timedelta
 from pathlib import Path
+
+# from django.conf.global_settings import *
 from dotenv import load_dotenv
 import os
 
@@ -62,6 +64,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
@@ -137,6 +140,10 @@ STATIC_URL = 'static/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
+# Путь для хранения файлов
+MEDIA_URL = '/media/'  # URL для доступа к файлам через браузер
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Папка для хранения файлов
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
@@ -145,9 +152,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES':[
          'rest_framework.permissions.AllowAny'
      ],
-    # 'DEFAULT_AUTHENTICATION_CLASSES': (
-    #       'rest_framework_simplejwt.authentication.JWTAuthentication',
-    #   )
+     'DEFAULT_AUTHENTICATION_CLASSES': (
+           'rest_framework_simplejwt.authentication.JWTAuthentication',
+       )
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     # 'PAGE_SIZE': 1,
 
@@ -165,6 +172,18 @@ CORS_ALLOW_METHODS = [
     "PATCH",
     "POST",
     "PUT",
+]
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
 ]
 
 SIMPLE_JWT = {

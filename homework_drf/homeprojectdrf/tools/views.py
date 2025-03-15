@@ -1,71 +1,41 @@
-#from rest_framework.permissions import AllowAny, IsAdminUser
-
-# from . models import Tools
-# from django.forms import model_to_dict
-from rest_framework import generics, viewsets, mixins
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.views import APIView
-
-# from django.shortcuts import render
-# from rest_framework.decorators import action
-# from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser
-# from rest_framework.response import Response
-# from rest_framework.views import APIView
-# from rest_framework.viewsets import GenericViewSet
-
-
-#*******************************************
+import django_filters
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from  . models import Tool
-from  . models import Order
-from  . models import Detail
-from  . models import Operation
 from .serializers import ToolSeralizer
-from . serializers import OrderSeralizer
-from . serializers import DetailSeralizer
-from . serializers import OperationSeralizer
 from rest_framework import viewsets
-#from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework import filters
 from .permissions import  CustomPermission
-from rest_framework.decorators import api_view, permission_classes
-#from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
 from django.contrib.auth.models import User
-from django.db import IntegrityError
 
 
+# class ToolFilter(django_filters.FilterSet):
+#     name = django_filters.CharFilter(field_name='name', lookup_expr='icontains')
+#
+#     class Meta:
+#         model = Tool
+#         fields = ['brand_tool']
 
 #*************************************************************************************
 class ToolViewSet(viewsets.ModelViewSet):
     queryset = Tool.objects.all()
     serializer_class = ToolSeralizer
-    permission_classes = (CustomPermission, )           #(AllForAdminOtherReadOnly, )
+    permission_classes = [CustomPermission]
     filter_backends = [filters.SearchFilter]  #[filters.OrderingFilter]
+    #filterset_class = ToolFilter
     search_fields = ['__all__']
 
-class OrderViewSet(viewsets.ModelViewSet):
-    queryset = Order.objects.all()
-    serializer_class = OrderSeralizer
-    permission_classes = (CustomPermission, )               #(AllForAdminOtherReadOnly, )
-    filter_backends = [filters.OrderingFilter]  #[filters.OrderingFilter]filters.SearchFilter
-    search_fields = ['__all__']
-
-class DetailViewSet(viewsets.ModelViewSet):
-    queryset = Detail.objects.all()
-    serializer_class = DetailSeralizer
-    permission_classes = (CustomPermission, )              #(AllForAdminOtherReadOnly, )
-    filter_backends = [filters.OrderingFilter]  #[filters.OrderingFilter]
-    search_fields = ['__all__']
-
-class OperationViewSet(viewsets.ModelViewSet):
-    queryset = Operation.objects.all()
-    serializer_class = OperationSeralizer
-    permission_classes = (CustomPermission, )             #(AllForAdminOtherReadOnly, )AllowAny
-    filter_backends = [filters.OrderingFilter]  #[filters.OrderingFilter]
-    search_fields = ['__all__']
-
+    # @action(detail=False, methods=['get'])
+    # def search(self, request):
+    #     name = request.query_params.get('brand_tool', None)
+    #     tools = self.queryset
+    #     if name:
+    #         tools = tools.filter(name__icontains=name)
+    #     serializer = self.get_serializer(tools, many=True)
+    #     return Response(serializer.data)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -74,6 +44,7 @@ def protected_view(request):
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])  # Разрешаем доступ без аутентификации
 def register_user(request):
     try:
         username = request.data.get('username')
@@ -86,6 +57,14 @@ def register_user(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        # Проверяем, существует ли пользователь
+        if User.objects.filter(username=username).exists():
+            return Response(
+                {'detail': 'Пользователь с таким именем уже существует'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Создаем нового пользователя
         user = User.objects.create_user(
             username=username,
             password=password,
@@ -97,14 +76,8 @@ def register_user(request):
             status=status.HTTP_201_CREATED
         )
 
-    except IntegrityError:
-        return Response(
-            {'detail': 'Пользователь с таким именем уже существует'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
     except Exception as e:
         return Response(
             {'detail': str(e)},
             status=status.HTTP_400_BAD_REQUEST
         )
-

@@ -13,12 +13,6 @@ export default function FeedbackSection(){
         <section>
             <h3>Обратная связь</h3>
 
-            <Button onClick={openModel}>Open modal</Button>
-
-            <Modal open={modal}>
-                <h2>Hello form modal</h2>
-                <p>Sample text</p>
-            </Modal>
         </section>
     )
 }

@@ -1,8 +1,9 @@
 import React from 'react';
-//import authService from '../../services/authService';
+import "../Common/Common.css";
 
-const Header = ({ user, onLogout, onLoginClick}) => {
+const Header = ({user, onLogout, onLoginClick}) => {
     return (
+
         <header style={{
             backgroundColor: '#f8f9fa',
             padding: '10px 20px',
@@ -12,10 +13,26 @@ const Header = ({ user, onLogout, onLoginClick}) => {
             boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
         }}>
             <div className="logo">GROSVER</div>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div>
+                <nav className="navbar navbar-expand-sm navbar-dark bg-dark">
+                    <div className="container-fluid">
+                        <button
+                            className="navbar-toggler"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#mynavbar"
+                        >
+                            <span className="navbar-toggler-icon"></span>
+                        </button>
+
+                    </div>
+                </nav>
+            </div>
+            <div style={{display: 'flex', alignItems: 'center'}}>
                 {user ? (
                     <>
-                        <span style={{ marginRight: '15px' }}>
+
+                        <span style={{marginRight: '15px'}}>
                             Пользователь: {user.username}
                         </span>
                         <button
@@ -48,6 +65,7 @@ const Header = ({ user, onLogout, onLoginClick}) => {
                     </button>
                 )}
             </div>
+
         </header>
     );
 };

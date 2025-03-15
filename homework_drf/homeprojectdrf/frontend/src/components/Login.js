@@ -1,187 +1,196 @@
-import React, { useState, useEffect } from 'react';
-import authService from '../services/authService';
+import React, { useState } from 'react';
+import axios from 'axios';
+import '../components/Login/Login.css';
 
 const Login = ({ onLoginSuccess, show, setShowLogin }) => {
     const [isLogin, setIsLogin] = useState(true);
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [email, setEmail] = useState('');
+    const [formData, setFormData] = useState({
+        username: '',
+        password: '',
+        email: ''
+    });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    // Сброс формы при закрытии
-    useEffect(() => {
-        if (!show) {
-            setUsername('');
-            setPassword('');
-            setEmail('');
-            setError('');
-            setIsLogin(true);
-        }
-    }, [show]);
+    // Если форма не должна отображаться, возвращаем null
+    if (!show) return null;
 
-    if (!show) {
-        return null;
-    }
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError('');
-        setLoading(true);
+    e.preventDefault();
+    setError('');
+    setLoading(true);
 
-        try {
-            if (isLogin) {
-                const data = await authService.login(username, password);
-                onLoginSuccess(data);
-            } else {
-                if (!email) {
-                    throw new Error('Пожалуйста, укажите email');
+    try {
+        if (isLogin) {
+            // Вход
+            console.log('Отправка данных для входа:', {  // Для отладки
+                username: formData.username,
+                password: formData.password
+            });
+
+            const response = await axios.post('http://127.0.0.1:8000/api/token/', {
+                username: formData.username,
+                password: formData.password
+            }, {
+                headers: {
+                    'Content-Type': 'application/json'
                 }
-                await authService.register(username, password, email);
-                const loginData = await authService.login(username, password);
-                onLoginSuccess(loginData);
+            });
+
+            console.log('Ответ сервера:', response.data); // Для отладки
+
+            if (!response.data.access) {
+                throw new Error('Токен не получен');
             }
-        } catch (error) {
-            console.error('Ошибка:', error);
-            setError(error.response?.data?.detail || error.message || 'Произошла ошибка');
-        } finally {
-            setLoading(false);
+
+            // Сохраняем токены
+            localStorage.setItem('token', response.data.access);
+            localStorage.setItem('refresh_token', response.data.refresh);
+
+            // Сохраняем информацию о пользователе
+            const userData = {
+                username: formData.username,
+                token: response.data.access
+            };
+
+            localStorage.setItem('user', JSON.stringify(userData));
+            console.log('Сохраненные данные:', userData); // Для отладки
+
+            onLoginSuccess(userData);
+            setShowLogin(false);
+        } else {
+            // Регистрация
+            if (!formData.email) {
+                throw new Error('Email обязателен для регистрации');
+            }
+
+            console.log('Отправка данных для регистрации:', {  // Для отладки
+                username: formData.username,
+                password: formData.password,
+                email: formData.email
+            });
+
+            // Сначала регистрируем пользователя
+            await axios.post('http://127.0.0.1:8000/api/register/', {
+                username: formData.username,
+                password: formData.password,
+                email: formData.email
+            });
+
+            // После успешной регистрации выполняем вход
+            const loginResponse = await axios.post('http://127.0.0.1:8000/api/token/', {
+                username: formData.username,
+                password: formData.password
+            });
+
+            localStorage.setItem('token', loginResponse.data.access);
+            localStorage.setItem('refresh_token', loginResponse.data.refresh);
+
+            const userData = {
+                username: formData.username,
+                token: loginResponse.data.access
+            };
+
+            localStorage.setItem('user', JSON.stringify(userData));
+
+            onLoginSuccess(userData);
+            setShowLogin(false);
         }
-    };
+    } catch (error) {
+        console.error('Ошибка:', error.response || error);
+        let errorMessage = 'Произошла ошибка при авторизации';
+
+        if (error.response) {
+            if (error.response.status === 401) {
+                errorMessage = 'Неверное имя пользователя или пароль';
+            } else {
+                errorMessage = error.response.data.detail || error.response.data.error || errorMessage;
+            }
+        }
+
+        setError(errorMessage);
+    } finally {
+        setLoading(false);
+    }
+};
 
     return (
         <>
-            <div style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                zIndex: 999
-            }} onClick={() => setShowLogin(false)} />
-            
-            <div style={{
-                position: 'fixed',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: '300px',
-                padding: '20px',
-                backgroundColor: 'white',
-                boxShadow: '0 0 10px rgba(0,0,0,0.1)',
-                borderRadius: '8px',
-                zIndex: 1000
-            }}>
+            <div className="modal-backdrop" onClick={() => setShowLogin(false)} />
+            <div className="login-modal">
                 <button
+                    className="close-button"
                     onClick={() => setShowLogin(false)}
-                    style={{
-                        position: 'absolute',
-                        right: '10px',
-                        top: '10px',
-                        background: 'none',
-                        border: 'none',
-                        fontSize: '20px',
-                        cursor: 'pointer',
-                        padding: '5px 10px'
-                    }}
                 >
                     ✕
                 </button>
 
-                <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>
-                    {isLogin ? 'Вход в систему' : 'Регистрация'}
-                </h2>
-                
+                <h2>{isLogin ? 'Вход в систему' : 'Регистрация'}</h2>
+
                 {error && (
-                    <div style={{ color: 'red', marginBottom: '10px', textAlign: 'center' }}>
+                    <div className="error-message">
                         {error}
                     </div>
                 )}
-                
+
                 <form onSubmit={handleSubmit}>
-                    <div style={{ marginBottom: '15px' }}>
+                    <div className="form-group">
                         <label>Имя пользователя:</label>
                         <input
                             type="text"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            style={{
-                                width: '100%',
-                                padding: '8px',
-                                marginTop: '5px',
-                                border: '1px solid #ddd',
-                                borderRadius: '4px'
-                            }}
+                            name="username"
+                            value={formData.username}
+                            onChange={handleChange}
+                            required
                         />
                     </div>
 
                     {!isLogin && (
-                        <div style={{ marginBottom: '15px' }}>
+                        <div className="form-group">
                             <label>Email:</label>
                             <input
                                 type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                style={{
-                                    width: '100%',
-                                    padding: '8px',
-                                    marginTop: '5px',
-                                    border: '1px solid #ddd',
-                                    borderRadius: '4px'
-                                }}
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
                             />
                         </div>
                     )}
 
-                    <div style={{ marginBottom: '20px' }}>
+                    <div className="form-group">
                         <label>Пароль:</label>
                         <input
                             type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            style={{
-                                width: '100%',
-                                padding: '8px',
-                                marginTop: '5px',
-                                border: '1px solid #ddd',
-                                borderRadius: '4px'
-                            }}
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            required
                         />
                     </div>
 
-                    <button 
+                    <button
                         type="submit"
+                        className="submit-button"
                         disabled={loading}
-                        style={{
-                            width: '100%',
-                            padding: '10px',
-                            backgroundColor: loading ? '#ccc' : '#007bff',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: loading ? 'not-allowed' : 'pointer',
-                            marginBottom: '10px'
-                        }}
                     >
                         {loading ? 'Загрузка...' : (isLogin ? 'Войти' : 'Зарегистрироваться')}
                     </button>
 
-                    <div style={{ textAlign: 'center' }}>
-                        <button
-                            type="button"
-                            onClick={() => setIsLogin(!isLogin)}
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                color: '#007bff',
-                                cursor: 'pointer',
-                                textDecoration: 'underline'
-                            }}
-                        >
-                            {isLogin ? 'Создать новый аккаунт' : 'Уже есть аккаунт? Войти'}
-                        </button>
-                    </div>
+                    <button
+                        type="button"
+                        className="toggle-button"
+                        onClick={() => setIsLogin(!isLogin)}
+                    >
+                        {isLogin ? 'Создать новый аккаунт' : 'Уже есть аккаунт? Войти'}
+                    </button>
                 </form>
             </div>
         </>
