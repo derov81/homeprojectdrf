@@ -12,6 +12,26 @@
     background-color: #ffffff ;
 }
 
+.tool h2{
+    text-align: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
+    'Droid Sans', 'Helvetica Neue', sans-serif;
+
+}
+
+.tool img{
+    align-content: flex-end;
+}
+
+.tool{
+    text-align: justify;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
+    'Droid Sans', 'Helvetica Neue', sans-serif;
+
+}
+
 .form-control{
     border-radius: 0px !important;
 }

@@ -91,7 +91,7 @@ export default function ShowTool() {
                     <h2>Список инструментов</h2>
 
                     {user && (
-                        <Link to={'create/'}>Добавить инструмент</Link>
+                        <Link to={'api/tools/create/'}>Добавить инструмент</Link>
                     )
                     }
 
@@ -130,7 +130,7 @@ export default function ShowTool() {
 
                                     {user && (
                                         <Link
-                                            to={`${tool.id}`}
+                                            to={`api/tools/${tool.id}`}
                                             className="btn btn-sm btn-outline-primary"
                                         >
                                             <i className="fa fa-pencil"></i>
@@ -138,7 +138,7 @@ export default function ShowTool() {
                                     )}
 
                                     <Link
-                                        to={`show/${tool.id}`}
+                                        to={`api/tools/show/${tool.id}`}
                                         className="btn btn-sm btn-outline-info"
                                     >
                                         <i className="fa fa-eye"></i>

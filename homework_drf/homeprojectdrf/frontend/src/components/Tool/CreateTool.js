@@ -64,7 +64,7 @@ const CreateTool = () => {
         console.log('Ответ сервера:', response); // Логируем ответ сервера
 
         if (response.status === 201) {
-            navigate("/api/tools/");
+            navigate("/");
         }
     } catch (err) {
         console.error('Ошибка при создании инструмента:', err);
@@ -80,11 +80,12 @@ const handleImageChange = (e) => {
     setTool((prev) => ({
         ...prev,
         image_url: file,
+        //src: require('./media/images/nophot.jpg').default,
     }));
 };
     return (
             <div className='tool-form'>
-                <Link to={'/api/tools/'}>На главную</Link>
+                <Link to={'/'}>На главную</Link>
                 <div className='heading'>
                     {isLoading && <Loader/>}
                     {error && <p>Error: {error}</p>}
@@ -126,7 +127,7 @@ const handleImageChange = (e) => {
                         </div>
 
                         <div className="mb-3">
-                            <label className="form-label">Диаметр инструмента</label>
+                            <label className="form-label">Диаметр инструмента*</label>
                             <input
                                 type="number"
                                 className="form-control"
@@ -136,11 +137,12 @@ const handleImageChange = (e) => {
                                 onChange={handleInput}
                                 min="0"
                                 step="0.1"
+                                required
                             />
                             </div>
 
                             <div className="mb-3">
-                                <label className="form-label">Рабочая длина</label>
+                                <label className="form-label">Рабочая длина*</label>
                                 <input
                                     type="number"
                                     className="form-control"
@@ -150,11 +152,12 @@ const handleImageChange = (e) => {
                                     onChange={handleInput}
                                     min="0"
                                     step="0.1"
+                                    required
                                 />
                             </div>
 
                             <div className="mb-3">
-                                <label className="form-label">Общая длина</label>
+                                <label className="form-label">Общая длина*</label>
                                 <input
                                     type="number"
                                     className="form-control"
@@ -164,10 +167,11 @@ const handleImageChange = (e) => {
                                     onChange={handleInput}
                                     min="0"
                                     step="0.1"
+                                    required
                                 />
                             </div>
                             <div className="mb-3">
-                                <label className="form-label">Материал заготовки</label>
+                                <label className="form-label">Материал заготовки*</label>
                                 <input
                                     type="text"
                                     className="form-control"
@@ -175,12 +179,11 @@ const handleImageChange = (e) => {
                                     name="material_of_detail"
                                     value={tool.material_of_detail}
                                     onChange={handleInput}
-                                    min="0"
-                                    step="0.1"
+                                    required
                                 />
                             </div>
                             <div className="mb-3">
-                                <label className="form-label">Материал инструмента</label>
+                                <label className="form-label">Материал инструмента*</label>
                                 <input
                                     type="text"
                                     className="form-control"
@@ -188,8 +191,7 @@ const handleImageChange = (e) => {
                                     name="material_of_tool"
                                     value={tool.material_of_tool}
                                     onChange={handleInput}
-                                    min="0"
-                                    step="0.1"
+                                    required
                                 />
                             </div>
                             <div className="mb-3">
@@ -201,8 +203,6 @@ const handleImageChange = (e) => {
                                     name="short_description"
                                     value={tool.short_description}
                                     onChange={handleInput}
-                                    min="0"
-                                    step="0.1"
                                 />
                             </div>
                             <div className="mb-3">
@@ -222,26 +222,10 @@ const handleImageChange = (e) => {
                                     className="form-control"
                                     name="image_url"
                                     accept="image/jpeg, image/png, image/gif"
+
                                     onChange={handleImageChange}
                                 />
                             </div>
-
-                            {/*<Form>*/}
-                            {/*    <div className="mb-3">*/}
-                            {/*        <Form.Group className="form-label">ФОТО</Form.Group>*/}
-                            {/*        <Form.Control*/}
-                            {/*            type='file'*/}
-                            {/*            name='image_url'*/}
-                            {/*            accept='image/jpeg, image/png, image/gif'*/}
-                            {/*            onChange={(e) => {*/}
-                            {/*                handleImageChange(e);*/}
-                            {/*            }}*/}
-                            {/*        >*/}
-
-                            {/*        </Form.Control>*/}
-                            {/*    </div>*/}
-                            {/*</Form>*/}
-
 
                             <div className="d-grid gap-2">
 
@@ -257,7 +241,7 @@ const handleImageChange = (e) => {
                                 <button
                                     type="button"
                                     className="btn btn-secondary"
-                                    onClick={() => navigate("/api/tools/")}
+                                    onClick={() => navigate("/")}
                                 >
                                     Отмена
                                 </button>
