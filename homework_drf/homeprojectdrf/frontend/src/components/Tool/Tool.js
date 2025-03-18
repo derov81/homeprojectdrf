@@ -33,27 +33,6 @@ const Tool = () => {
           <p className="tool img">{<Image src={tool.image_url}/>}</p>
           <p>{tool.description}</p>
       </div>
-
-      {/*<table className="table table-bordered">*/}
-      {/*    <thead>*/}
-      {/*    <tr>*/}
-      {/*        <th>Бренд</th>*/}
-      {/*        <th>Тип инструмента</th>*/}
-      {/*        <th>Рабочая длина</th>*/}
-      {/*        <th>Общая длина</th>*/}
-      {/*    </tr>*/}
-      {/*    </thead>*/}
-      {/*    <tbody>*/}
-      {/*    <tr>*/}
-      {/*        <td>{tool.brand_tool}</td>*/}
-      {/*        <td>{tool.type_tool}</td>*/}
-      {/*        <td>{tool.working_length_tool}</td>*/}
-      {/*        <td>{tool.length_tool}</td>*/}
-      {/*        <td>{<Image src={tool.image_url}/>}</td>*/}
-      {/*    </tr>*/}
-
-      {/*    </tbody>*/}
-      {/*</table>*/}
     </div>
   );
 };
