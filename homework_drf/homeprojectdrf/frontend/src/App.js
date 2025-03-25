@@ -5,6 +5,8 @@ import authService from './services/authService';
 import TabsSection from "./components/TabsSection";
 import FeedbackSection from "./components/FeedbackSection";
 import Home from "./components/Home";
+import AdminPanel from "./components/AdminPanel";
+
 
 
 
@@ -14,6 +16,7 @@ const App = () => {
     const [showLogin, setShowLogin] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [tab, setTab] = useState('main');
+
 
     useEffect(() => {
         // При загрузке страницы проверяем наличие пользователя
@@ -66,6 +69,7 @@ const App = () => {
                 )}
 
                 {tab === 'feedback' && <FeedbackSection/>}
+                {tab === 'admin_panel' && <AdminPanel/>}
 
             </main>
         </div>
