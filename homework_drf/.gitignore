@@ -1,2 +1,5 @@
 .env
 /.idea
+package.json
+package-lock.json
+../db.sqlite3

@@ -1,8 +1,7 @@
 import axios from 'axios';
 import * as axiosInstance from "browserslist";
 
-const API_URL = 'http://127.0.0.1:8000/api/';
-
+const API_URL = 'http://127.0.0.1:8000/api/users/';
 class AuthService   {
     async login(username, password) {
         try {
@@ -11,6 +10,7 @@ class AuthService   {
                 password
             });
 
+
             if (response.data.access) {
                 const userData = {
                     username,
@@ -18,6 +18,7 @@ class AuthService   {
                     refresh: response.data.refresh
                 };
                 localStorage.setItem('user', JSON.stringify(userData));
+
                  // Устанавливаем токен в заголовки для последующих запросов
                  axiosInstance.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.access;
                 return userData;
@@ -50,6 +51,7 @@ class AuthService   {
     getCurrentUser() {
         return JSON.parse(localStorage.getItem('user'));
     }
+
 }
 
 export default new  AuthService();

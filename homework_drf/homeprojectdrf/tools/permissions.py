@@ -21,6 +21,10 @@ class CustomPermission(permissions.BasePermission):
         # Авторизованные пользователи могут редактировать (PUT, PATCH)
         if request.method in ['PUT', 'PATCH']:
             return request.user.is_authenticated
+
+        # Авторизованные пользователи is_staff могут редактировать (PUT, PATCH, DELETE)
+        if request.method in ['PUT', 'PATCH', 'DELETE']:
+            return request.user.is_staff
             
         # Запрещаем удаление для обычных пользователей
         if request.method in ['DELETE']:

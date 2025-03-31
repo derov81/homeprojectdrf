@@ -1,15 +1,20 @@
 import django_filters
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from  . models import Tool
 from .serializers import ToolSeralizer
 from rest_framework import viewsets
 from rest_framework import filters
-from .permissions import  CustomPermission
+from .permissions import CustomPermission
 from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
+from rest_framework import generics
+from .models import SliderImage
+from .serializers import SliderImageSerializer
+from .serializers import UserSerializer
 from django.contrib.auth.models import User
+
 
 
 # class ToolFilter(django_filters.FilterSet):
@@ -81,3 +86,25 @@ def register_user(request):
             {'detail': str(e)},
             status=status.HTTP_400_BAD_REQUEST
         )
+
+class SliderImageListCreate(generics.ListCreateAPIView):
+    queryset = SliderImage.objects.all()
+    serializer_class = SliderImageSerializer
+
+class SliderImageDelete(generics.DestroyAPIView):
+    queryset = SliderImage.objects.all()
+    serializer_class = SliderImageSerializer
+
+
+# Список пользователей
+class UserListView(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [CustomPermission]
+
+# Работа с конкретным пользователем (просмотр, редактирование, удаление)
+class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [CustomPermission]
+

@@ -40,9 +40,9 @@ class Tool(models.Model):
     length_tool = models.IntegerField()
     material_of_detail = models.CharField(max_length=60)
     material_of_tool = models.CharField(max_length=60)
-    short_description = models.CharField(max_length=150)
-    description = models.TextField()
-    image_url = models.ImageField(upload_to='images', blank=True, null=True)
+    short_description = models.CharField(max_length=150, null=True)
+    description = models.TextField(null=True)
+    image_url = models.ImageField(upload_to='images', blank=True, null=True, default='images/nophoto.jpg')
     operation_id = models.ForeignKey(Operation, null=True, on_delete=models.CASCADE)
 
 
@@ -52,4 +52,13 @@ class Tool(models.Model):
         return (f'{self.brand_tool}-{self.type_tool}-{self.diametr} | {self.working_length_tool}mm | {self.length_tool}mm'
                 f'| {self.material_of_detail}| {self.material_of_tool}| {self.short_description}'
                 f'| {self.description}| {self.image_url}')
+
+
+class SliderImage(models.Model):
+    image = models.ImageField(upload_to='slider_images/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Image {self.image} | {self.uploaded_at}"
+
 

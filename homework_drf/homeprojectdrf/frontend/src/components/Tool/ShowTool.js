@@ -4,11 +4,12 @@ import {Link} from "react-router-dom";
 import Loader from "../Common/Loader";
 import AuthService from "../../services/authService";
 import './Tool.css'
+import {Image} from "react-bootstrap";
 //import SearchTools from "./SearchTools";
 
-export default function ShowTool() {
-    const API_URL = "http://127.0.0.1:8000/api/tools/";  // Исправленный URL
 
+export default function ShowTool() {
+    const API_URL = "http://127.0.0.1:8000/api/tools/";
     const [tools, setTools] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -46,10 +47,11 @@ export default function ShowTool() {
             const token = localStorage.getItem('token');
             const response = await axios.get(API_URL, {
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    Authorization: `Bearer ${token}`
                 }
             });
             setTools(response.data);
+
         } catch (error) {
             console.error('Ошибка при загрузке данных:', error);
             setError(error.response?.data?.detail || 'Ошибка при загрузке инструментов');
@@ -60,6 +62,7 @@ export default function ShowTool() {
 
     useEffect(() => {
         fetchTools();
+
     }, []);
 
     if (isLoading) {
@@ -76,90 +79,96 @@ export default function ShowTool() {
 
     if (!tools.length) {
         return (
-            <div className="alert alert-info" role="alert">
+            <div className="alert alert-info" >
                 Инструменты не найдены
+                <br/>
+                {user && (
+                    <Link to={'api/tools/create/'}>Добавить инструмент</Link>
+                )
+                }
             </div>
         );
     }
 
 
     return (
-            <div className="container mt-5">
+        <div className="container mt-5">
+            <div className="d-flex justify-content-between mb-3">
 
-                <div className="d-flex justify-content-between mb-3">
+                <h2>Список инструментов</h2>
 
-                    <h2>Список инструментов</h2>
+                {user && (
+                    <Link to={'api/tools/create/'}>Добавить инструмент</Link>
+                )
+                }
 
-                    {user && (
-                        <Link to={'api/tools/create/'}>Добавить инструмент</Link>
-                    )
-                    }
-
-                </div>
-
-                {isLoading && <Loader/>}
-
-                <table className="table table-striped table-hover">
-                    <thead className="table-dark">
-                    <tr>
-                        <th>№</th>
-                        <th>Бренд</th>
-                        <th>Тип</th>
-                        <th>Рабочая длина</th>
-                        <th>Общая длина</th>
-                        <th>Материал обработки</th>
-                        <th>Материал инструмента</th>
-                        <th>Краткое описание</th>
-                        <th>Действия</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-
-                    {tools.map((tool, index) => (
-                        <tr key={tool.id}>
-                            <td>{index + 1}</td>
-                            <td>{tool.brand_tool}</td>
-                            <td>{tool.type_tool}</td>
-                            <td>{tool.working_length_tool}</td>
-                            <td>{tool.length_tool}</td>
-                            <td>{tool.material_of_detail}</td>
-                            <td>{tool.material_of_tool}</td>
-                            <td>{tool.short_description}</td>
-                            <td>
-                                <div className="btn-group" role="group">
-
-                                    {user && (
-                                        <Link
-                                            to={`api/tools/${tool.id}`}
-                                            className="btn btn-sm btn-outline-primary"
-                                        >
-                                            <i className="fa fa-pencil"></i>
-                                        </Link>
-                                    )}
-
-                                    <Link
-                                        to={`api/tools/show/${tool.id}`}
-                                        className="btn btn-sm btn-outline-info"
-                                    >
-                                        <i className="fa fa-eye"></i>
-                                    </Link>
-                                    {user && user.username === 'admin' &&
-
-                                        (<button
-                                            className="btn btn-sm btn-outline-danger"
-                                            onClick={() => handleDelete(tool.id)}
-                                        >
-                                            <i className="fa fa-trash"></i>
-                                        </button>)
-                                    }
-
-                                </div>
-                            </td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
             </div>
+
+            {isLoading && <Loader/>}
+
+            <table className="table table-striped table-hover">
+                <thead className="table-dark">
+                <tr>
+                    <th>№</th>
+                    <th>Фото</th>
+                    <th>Наименования инструмента</th>
+                    <th>Тип</th>
+                    {/*<th>Рабочая длина</th>*/}
+                    {/*<th>Общая длина</th>*/}
+                    {/*<th>Материал обработки</th>*/}
+                    {/*<th>Материал инструмента</th>*/}
+                    {/*<th>Краткое описание</th>*/}
+                    <th>Действия</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                {tools.map((tool, index) => (
+                    <tr key={tool.id}>
+                        <td>{index + 1}</td>
+                        <td>{<Image src={tool.image_url} width={38} height={38}/>}</td>
+                        <td>{tool.brand_tool}</td>
+                        <td>{tool.type_tool}</td>
+                        {/*<td>{tool.working_length_tool}</td>*/}
+                        {/*<td>{tool.length_tool}</td>*/}
+                        {/*<td>{tool.material_of_detail}</td>*/}
+                        {/*<td>{tool.material_of_tool}</td>*/}
+                        {/*<td>{tool.short_description}</td>*/}
+                        <td>
+                            <div className="btn-group" role="group">
+
+                                {user && (
+                                    <Link
+                                        to={`api/tools/${tool.id}`}
+                                        className="btn btn-sm btn-outline-primary"
+                                    >
+                                        <i className="fa fa-pencil"></i>
+                                    </Link>
+                                )}
+
+                                <Link
+                                    to={`api/tools/show/${tool.id}`}
+                                    className="btn btn-sm btn-outline-info"
+                                >
+                                    <i className="fa fa-eye"></i>
+                                </Link>
+
+                                {user &&
+
+                                    (<button
+                                        className="btn btn-sm btn-outline-danger"
+                                        onClick={() => handleDelete(tool.id)}
+                                    >
+                                        <i className="fa fa-trash"></i>
+                                    </button>)
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                ))}
+                </tbody>
+            </table>
+        </div>
 
     );
 };
