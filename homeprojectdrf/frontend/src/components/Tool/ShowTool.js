@@ -5,7 +5,7 @@ import Loader from "../Common/Loader";
 import AuthService from "../../services/authService";
 import './Tool.css'
 import {Image} from "react-bootstrap";
-//import SearchTools from "./SearchTools";
+
 
 
 export default function ShowTool() {
@@ -16,7 +16,7 @@ export default function ShowTool() {
     const [filteredTools, setFilteredTools] = useState([]); // Отфильтрованные данные
     const [searchTerm, setSearchTerm] = useState(""); // Поле ввода поиска
     const [currentPage, setCurrentPage] = useState(1);
-    const toolsPerPage = 2;
+    const toolsPerPage = 10;
 
     const user = AuthService.getCurrentUser()
 
@@ -66,8 +66,7 @@ export default function ShowTool() {
 
     useEffect(() => {
         fetchTools();
-        console.log("Текущая страница:", currentPage);
-    }, [currentPage]);
+    }, []);
 
     // Фильтрация инструментов при изменении searchTerm
     useEffect(() => {
@@ -199,21 +198,16 @@ export default function ShowTool() {
                 ))}
                 </tbody>
             </table>
-            <nav>
-                <ul className="pagination justify-content-center">
-                    <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                        <button className="page-link" onClick={prevPage}>Назад</button>
-                    </li>
-                    {Array.from({length: totalPages}, (_, i) => (
-                        <li key={i} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
-                            <button onClick={() => setCurrentPage(i + 1)} className="page-link">{i + 1}</button>
-                        </li>
-                    ))}
-                    <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                        <button className="page-link" onClick={nextPage}>Вперед</button>
-                    </li>
-                </ul>
-            </nav>
+            <div style={{display: "flex", justifyContent: "center", gap: "10px", marginTop: "10px"}}>
+                <button className="page-link" onClick={prevPage} disabled={currentPage === 1}>Назад</button>
+                {Array.from({length: totalPages}, (_, i) => (
+                    <button key={i} onClick={() => setCurrentPage(i + 1)}
+                            className={`page-link ${currentPage === i + 1 ? 'active' : ''}`}>
+                        {i + 1}
+                    </button>
+                ))}
+                <button className="page-link" onClick={nextPage} disabled={currentPage === totalPages}>Вперед</button>
+            </div>
         </div>
 
     );
