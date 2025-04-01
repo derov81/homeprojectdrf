@@ -13,7 +13,10 @@ export default function ShowTool() {
     const [tools, setTools] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
-
+    const [filteredTools, setFilteredTools] = useState([]); // Отфильтрованные данные
+    const [searchTerm, setSearchTerm] = useState(""); // Поле ввода поиска
+    const [currentPage, setCurrentPage] = useState(1);
+    const toolsPerPage = 2;
 
     const user = AuthService.getCurrentUser()
 
@@ -51,6 +54,7 @@ export default function ShowTool() {
                 }
             });
             setTools(response.data);
+            setFilteredTools(response.data); // Изначально отображаем все инструменты
 
         } catch (error) {
             console.error('Ошибка при загрузке данных:', error);
@@ -62,8 +66,27 @@ export default function ShowTool() {
 
     useEffect(() => {
         fetchTools();
+        console.log("Текущая страница:", currentPage);
+    }, [currentPage]);
 
-    }, []);
+    // Фильтрация инструментов при изменении searchTerm
+    useEffect(() => {
+    const filtered = tools.filter(tool =>
+        tool.brand_tool.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredTools(filtered);
+    if (currentPage > Math.ceil(filtered.length / toolsPerPage)) {
+        setCurrentPage(1); // Сбрасываем только если текущая страница больше, чем доступные страницы
+    }
+}, [searchTerm, tools]);
+
+    const indexOfLastTool = currentPage * toolsPerPage;
+    const indexOfFirstTool = indexOfLastTool - toolsPerPage;
+    const currentTools = filteredTools.slice(indexOfFirstTool, indexOfLastTool);
+
+    const totalPages = Math.ceil(filteredTools.length / toolsPerPage);
+    const nextPage = () => setCurrentPage(prev => (prev < totalPages ? prev + 1 : prev));
+    const prevPage = () => setCurrentPage(prev => (prev > 1 ? prev - 1 : prev));
 
     if (isLoading) {
         return <Loader/>;
@@ -79,7 +102,7 @@ export default function ShowTool() {
 
     if (!tools.length) {
         return (
-            <div className="alert alert-info" >
+            <div className="alert alert-info">
                 Инструменты не найдены
                 <br/>
                 {user && (
@@ -89,7 +112,6 @@ export default function ShowTool() {
             </div>
         );
     }
-
 
     return (
         <div className="container mt-5">
@@ -103,6 +125,15 @@ export default function ShowTool() {
                 }
 
             </div>
+
+            {/* Поле ввода для поиска */}
+            <input
+                type="text"
+                className="form-control mb-3"
+                placeholder="Поиск по наименованию..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+            />
 
             {isLoading && <Loader/>}
 
@@ -123,9 +154,9 @@ export default function ShowTool() {
                 </thead>
                 <tbody>
 
-                {tools.map((tool, index) => (
+                {currentTools.map((tool, index) => (
                     <tr key={tool.id}>
-                        <td>{index + 1}</td>
+                        <td>{indexOfFirstTool + index + 1}</td>
                         <td>{<Image src={tool.image_url} width={38} height={38}/>}</td>
                         <td>{tool.brand_tool}</td>
                         <td>{tool.type_tool}</td>
@@ -168,6 +199,21 @@ export default function ShowTool() {
                 ))}
                 </tbody>
             </table>
+            <nav>
+                <ul className="pagination justify-content-center">
+                    <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                        <button className="page-link" onClick={prevPage}>Назад</button>
+                    </li>
+                    {Array.from({length: totalPages}, (_, i) => (
+                        <li key={i} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
+                            <button onClick={() => setCurrentPage(i + 1)} className="page-link">{i + 1}</button>
+                        </li>
+                    ))}
+                    <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                        <button className="page-link" onClick={nextPage}>Вперед</button>
+                    </li>
+                </ul>
+            </nav>
         </div>
 
     );
