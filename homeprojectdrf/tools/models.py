@@ -29,9 +29,6 @@ class Operation(models.Model):
         return f'{self.name}'
 
 
-# def upload_to(instance, filename):
-#     return f'images/{filename}'.format(filename=filename)
-
 class Tool(models.Model):
     brand_tool = models.CharField(max_length=60)
     type_tool = models.CharField(max_length=60)
@@ -52,6 +49,24 @@ class Tool(models.Model):
         return (f'{self.brand_tool}-{self.type_tool}-{self.diametr} | {self.working_length_tool}mm | {self.length_tool}mm'
                 f'| {self.material_of_detail}| {self.material_of_tool}| {self.short_description}'
                 f'| {self.description}| {self.image_url}')
+
+class Feedback(models.Model):
+    STATUS_CHOICES = [
+        ('sent', 'Отправленно'),
+        ('in_progress', 'В процессе'),
+        ('answered','Отвечено'),
+        ('closed','Закрыто'),
+    ]
+
+    name = models.CharField(max_length=255, verbose_name='Имя')
+    email = models.EmailField(blank=True, null=True, verbose_name='Email')
+    message = models.TextField(verbose_name='Сообщение')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='sent', verbose_name='Статус')
+    attachment = models.FileField(upload_to='feedback_attachments/', blank=True, verbose_name='Вложение')
+    create_at = models.DateTimeField(auto_created=True)
+
+    def __str__(self):
+        return f'{self.name} ({self.get_status_display()})'
 
 
 class SliderImage(models.Model):
