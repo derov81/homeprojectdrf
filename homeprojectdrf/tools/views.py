@@ -93,13 +93,14 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [CustomPermission]
 
 class FeedbackViewSet(viewsets.ModelViewSet):
-    queryset = Feedback.objects.all().order_by('-created_at')
+    queryset = Feedback.objects.all().order_by('-create_at')
     serializer_class = FeedbackSerializer
+
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve', 'update', 'destroy']:
             return  [IsAdminUser()] #Админ видит и редактирует заявки
-        return [AllowAny] #Любой пользователь может отправлять
+        return [AllowAny()] #Любой пользователь может отправлять
 
     def perform_update(self, serializer):
         feedback = serializer.save()

@@ -6,10 +6,13 @@ from .views import register_user
 from . views import ToolViewSet
 from .views import SliderImageListCreate, SliderImageDelete
 from .views import UserListView, UserDetailView
+from .views import FeedbackViewSet
 
 
 router = routers.DefaultRouter()
 router.register('tools', ToolViewSet)
+#router.register('feedback', FeedbackViewSet)
+
 
 urlpatterns = [
     path('', include(router.urls)),
@@ -20,6 +23,7 @@ urlpatterns = [
     path('register/', register_user, name='register'),
     path('images/', SliderImageListCreate.as_view(), name='image-list'),
     path('images/<int:pk>/', SliderImageDelete.as_view(), name='image-delete'),
+    path('feedback/',FeedbackViewSet.as_view({'get': 'list'}), name='feedback'),
 
 # API для работы с пользователями
     path('users/', UserListView.as_view(), name='user-list'),  # Получение списка пользователей
