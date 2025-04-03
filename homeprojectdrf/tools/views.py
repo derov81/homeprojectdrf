@@ -96,22 +96,22 @@ class FeedbackViewSet(viewsets.ModelViewSet):
     queryset = Feedback.objects.all().order_by('-create_at')
     serializer_class = FeedbackSerializer
 
-
+    # Правильный метод get_permissions без @api_view
     def get_permissions(self):
         if self.action in ['list', 'retrieve', 'update', 'destroy']:
-            return  [IsAdminUser()] #Админ видит и редактирует заявки
-        return [AllowAny()] #Любой пользователь может отправлять
+            return [IsAdminUser()]  # Админ видит и редактирует заявки
+        return [AllowAny()]  # Любой пользователь может отправлять
 
     def perform_update(self, serializer):
         feedback = serializer.save()
-        #Отправка email при ответе админа
-        if feedback.status == 'answered' and  feedback.email:
+        # Отправка email при ответе админа
+        if feedback.status == 'answered' and feedback.email:
             send_mail(
                 'Ответ на ваш запрос',
-                'Ваш запрос рассмотрен. Администратор ответит вам в ближайшее время.'
+                'Ваш запрос рассмотрен. Администратор ответит вам в ближайшее время.',
                 'admin@example.com',
                 [feedback.email],
-                fail_silently= True,
+                fail_silently=True,
             )
 
 
