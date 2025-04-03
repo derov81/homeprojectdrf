@@ -1,11 +1,10 @@
-import django_filters
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from  . models import Tool
 from .serializers import ToolSeralizer
 from rest_framework import viewsets
 from rest_framework import filters
 from .permissions import CustomPermission
-from rest_framework.decorators import api_view, permission_classes, action
+from rest_framework.decorators import permission_classes
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -14,17 +13,10 @@ from .models import SliderImage
 from .serializers import SliderImageSerializer
 from .serializers import UserSerializer
 from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from .models import Feedback
+from  .serializers import FeedbackSerializer
 
-
-
-# class ToolFilter(django_filters.FilterSet):
-#     name = django_filters.CharFilter(field_name='name', lookup_expr='icontains')
-#
-#     class Meta:
-#         model = Tool
-#         fields = ['brand_tool']
-
-#*************************************************************************************
 class ToolViewSet(viewsets.ModelViewSet):
     queryset = Tool.objects.all()
     serializer_class = ToolSeralizer
@@ -33,14 +25,6 @@ class ToolViewSet(viewsets.ModelViewSet):
     #filterset_class = ToolFilter
     search_fields = ['__all__']
 
-    # @action(detail=False, methods=['get'])
-    # def search(self, request):
-    #     name = request.query_params.get('brand_tool', None)
-    #     tools = self.queryset
-    #     if name:
-    #         tools = tools.filter(name__icontains=name)
-    #     serializer = self.get_serializer(tools, many=True)
-    #     return Response(serializer.data)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -107,4 +91,27 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [CustomPermission]
+
+class FeedbackViewSet(viewsets.ModelViewSet):
+    queryset = Feedback.objects.all().order_by('-create_at')
+    serializer_class = FeedbackSerializer
+
+    # Правильный метод get_permissions без @api_view
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve', 'update', 'destroy']:
+            return [IsAdminUser()]  # Админ видит и редактирует заявки
+        return [AllowAny()]  # Любой пользователь может отправлять
+
+    def perform_update(self, serializer):
+        feedback = serializer.save()
+        # Отправка email при ответе админа
+        if feedback.status == 'answered' and feedback.email:
+            send_mail(
+                'Ответ на ваш запрос',
+                'Ваш запрос рассмотрен. Администратор ответит вам в ближайшее время.',
+                'admin@example.com',
+                [feedback.email],
+                fail_silently=True,
+            )
+
 
